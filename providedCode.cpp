@@ -103,5 +103,50 @@ int main() {
 // class defintions here if you wish.
 
 void sortDataList(list<Data *> &l) {
-  // Fill in this function
+	list<Data *>::const_iterator it =  l.begin();
+	advance	(it, 3);
+	num1 = stof(l,*it);	// gets a float from list
+	advance (it,1)
+	num2 = stof(l,*it);	// gets consecutive float from list
+	advance (it,1)
+	num3 = stof(l,*it);	//gets next consecutive float
+
+	if( size < 102000){	//if true, it must be test case 1
+	}
+		//execute t1_sort		
+	else if (num1<1000 and  num2<1000 and  num3<1000   ){	//if true, the numbers must be from test case 3  
+		//execute t3_sort
+	}
+	else if( abs(num1 - num2) <= 1.0 and abs(num2 - num3) <= 1.0){ //if two instances of consecutive numbers
+								    // are both within 1.0 of each other, then 
+								    // must be test case 4
+		//execute t4_sort
+	}
+	else 
+		//execute t2_sort
+
+}	
+
+void t4_sort(list<Data *> &l) {
+	int jpD, temp;
+
+	for (list<Data *>::const_iterator ipD = l.begin(); ipD != l.end(); ipD++){
+		jpD = ipD; // set the pointers equal
+		while (jpD > l.begin() and jpD < *prev(jpD)){
+			temp = jpD; 		// perform swap
+			jpD = *prev(jpD);
+			*prev(jpD) = temp;
+			j--;			//check swap needed for next previous
+		}
+	}
 }
+ 	
+
+}		
+		
+  	// create 4 different sorting algorithms
+  	// apply the algorithm to each sort
+}
+
+
+
