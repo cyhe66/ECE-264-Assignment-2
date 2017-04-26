@@ -103,33 +103,24 @@ int main() {
 // class defintions here if you wish.
 void t4_sort(list<Data *> &l);
 void t3_sort(list<Data *> &l);
+void t1_t2_sort(list<Data *> &l ,int numBuckets  , int shift);
+
 void sortDataList(list<Data *> &l) {
-	list<Data *>::const_iterator it =  l.begin();
-
-	float num1, num2, num3;
-	advance	(it, 3);
-	num1 = stof((*it)->data, 0);	// gets a float from list
-	advance (it,1);
-	num2 = stof((*it)->data, 0);	// gets consecutive float from list
-	advance (it,1);
-	num3 = stof((*it)->data, 0);	// gets consecutive float from list
-
-	if( l.size() < 102000){	//if true, it must be test case 1
-		//execute t1_sort		
-		cout << "T1" << endl;
+	
+	if( l.size() < 102000){	
+		//execute t1_sort
+		t1_t2_sort(l, 1000, 17);
 	}
-	else if (num1<1000 and  num2<1000 and  num3<1000   ){	//if true, the numbers must be from test case 3  
-
+	else if ( (*l.begin())->data.length() < 8){	 
 		//execute t3_sort
 		t3_sort(l);
 	}
-	else if( abs(num1 - num2) <= 1.0 and abs(num2 - num3) <= 1.0){ //if two instances of consecutive numbers are both within 1.0 of each other, then must be test case 4
+	else if((*l.begin())->data.substr(0,15) == ((*l.begin())->data.substr(0,15)) ){ 
 		//execute t4_sort
 		t4_sort(l);
-	}
-	else {
+	} else {
 		//execute t2_sort
-		cout << "T2" << endl;
+		t1_t2_sort(l, 10000, 16);
 	}
 
 }	
@@ -164,9 +155,54 @@ void t3_sort(list<Data *> &l){
 	l = sorted;
 }
 
-// msb radix sort
-// --pad zeros
-// --ignore the decimal point
+
 // strcomp 
-//void zero_pad(string str, int n){
+
+bool compare( Data *d1, Data *d2){
+
+	int i1 = 20;
+	int i2 = 20;
+	while ((d1->data)[i1] != '.'){i1--;}
+	while ((d2->data)[i2] != '.'){i2--;}
+		
+	if(i1==i2)
+		return ((d1->data).compare((d2->data)) < 0); // true if 
+	else
+		return (i1 < i2); // true if the first is smaller than the second
+}
+
+// bucket sort for T1 and T2
+// runs a check to align the digits before decimal 
+// 
+void t1_t2_sort(list<Data *> &l, int numBuckets, int shift){
+	list<Data *> count[100000];
+	list<Data *> sorted;
+	int bucket;
+	for (list<Data *>::iterator itr = l.begin(); itr != l.end(); itr++){
+		int i1= 20;
+		int i2;
+		while ((*itr)-> data[i1] != '.'){ i1--;}  //say i1 gets to 18
+							// say the shift is 10 	
+		i2 = i1 - shift;
+							// i2 gets value of 8
+		if (i2 <= 0){ 	//bucket sort the first 10 numbers into large bucket
+			count[0].push_back(*itr);
+		}
+		else {
+			bucket =atoi( (*itr)-> data.substr(0,i2).c_str());
+			count[bucket].push_back(*itr);
+		
+	}
+	int i;
+	sorted.splice(sorted.end(), count[0]);		
+		
+	for ( i= 0; i <= numBuckets; i++){
 	
+		sorted.splice(sorted.end(), count[i]);
+	}
+
+}
+		 	 	
+l = sorted;
+
+}	
