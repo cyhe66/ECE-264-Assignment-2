@@ -103,24 +103,24 @@ int main() {
 // class defintions here if you wish.
 void t4_sort(list<Data *> &l);
 void t3_sort(list<Data *> &l);
-void t1_t2_sort(list<Data *> &l ,int numBuckets  , int shift);
+void t1_t2_sort(list<Data *> &l);
 
 void sortDataList(list<Data *> &l) {
 	
 	if( l.size() < 102000){	
 		//execute t1_sort
-		t1_t2_sort(l, 1000, 17);
+		t1_t2_sort(l);
 	}
 	else if ( (*l.begin())->data.length() < 8){	 
 		//execute t3_sort
 		t3_sort(l);
 	}
-	else if((*l.begin())->data.substr(0,15) == ((*l.begin())->data.substr(0,15)) ){ 
+	else if((*l.begin())->data.substr(0,10) == ((*++l.begin())->data.substr(0,10)) ){ 
 		//execute t4_sort
 		t4_sort(l);
 	} else {
 		//execute t2_sort
-		t1_t2_sort(l, 10000, 16);
+		t1_t2_sort(l);
 	}
 
 }	
@@ -155,9 +155,6 @@ void t3_sort(list<Data *> &l){
 	l = sorted;
 }
 
-
-// strcomp 
-
 bool compare( Data *d1, Data *d2){
 
 	int i1 = 20;
@@ -171,38 +168,31 @@ bool compare( Data *d1, Data *d2){
 		return (i1 < i2); // true if the first is smaller than the second
 }
 
-// bucket sort for T1 and T2
-// runs a check to align the digits before decimal 
-// 
-void t1_t2_sort(list<Data *> &l, int numBuckets, int shift){
-	list<Data *> count[100000];
+list<Data *> count_a[100000];
+void t1_t2_sort(list<Data *> &l){
 	list<Data *> sorted;
 	int bucket;
 	for (list<Data *>::iterator itr = l.begin(); itr != l.end(); itr++){
 		int i1= 20;
-		int i2;
-		while ((*itr)-> data[i1] != '.'){ i1--;}  //say i1 gets to 18
-							// say the shift is 10 	
-		i2 = i1 - shift;
-							// i2 gets value of 8
-		if (i2 <= 0){ 	//bucket sort the first 10 numbers into large bucket
-			count[0].push_back(*itr);
+		while ((*itr)-> data[i1] != '.'){ i1--;}  
+		i1 = 20 - i1; 
+				 	
+		if (i1 < 5 ){ 	
+			bucket = atoi( ((*itr)->data).substr(0,(5-i1)).c_str());
+			count_a[bucket].push_back(*itr);
 		}
 		else {
-			bucket =atoi( (*itr)-> data.substr(0,i2).c_str());
-			count[bucket].push_back(*itr);
-		
+			count_a[0].push_back(*itr);
+		}
 	}
-	int i;
-	sorted.splice(sorted.end(), count[0]);		
 		
-	for ( i= 0; i <= numBuckets; i++){
-	
-		sorted.splice(sorted.end(), count[i]);
+	for (int i= 0; i < 100000; i++){
+		if(count_a[i].empty())
+			continue;
+		t4_sort(count_a[i]);
+		sorted.splice(sorted.end(), count_a[i]);
 	}
-
+	l = sorted;
 }
 		 	 	
-l = sorted;
-
-}	
+	
