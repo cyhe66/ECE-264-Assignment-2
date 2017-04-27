@@ -103,31 +103,35 @@ int main() {
 // class defintions here if you wish.
 void t4_sort(list<Data *> &l);
 void t3_sort(list<Data *> &l);
-void t1_t2_sort(list<Data *> &l);
+void t1_t2_sort(list<Data *> &l, int n);
+list<Data *> count_a[10000000];
+list<Data *> sorted;
+Data *p[1020000];
+int bucket;
+		
 
+//looks at a few pieces of information based off the given list
+//and chooses which sorting algorithm to use
 void sortDataList(list<Data *> &l) {
-	
+	int s = l.size();
 	if( l.size() < 102000){	
-		//execute t1_sort
-		t1_t2_sort(l);
+		t1_t2_sort(l,0);// execute version 1 of sort
 	}
 	else if ( (*l.begin())->data.length() < 8){	 
-		//execute t3_sort
 		t3_sort(l);
 	}
 	else if((*l.begin())->data.substr(0,10) == ((*++l.begin())->data.substr(0,10)) ){ 
-		//execute t4_sort
 		t4_sort(l);
 	} else {
-		//execute t2_sort
-		t1_t2_sort(l);
+		t1_t2_sort(l,1);// execute version 2 of sort
 	}
 
 }	
 
+//insertion sort for almost sorted list
 void t4_sort(list<Data *> &l) {
 	for(list<Data *>::iterator i = l.begin(); i != l.end(); i++){
-		// TODO Check for case where overflow changes number of digits
+		// TODO Check for super rare case where overflow changes number of digits
 		while(i != l.begin() and (*i)->data < (*prev(i))->data ){
 			iter_swap(i, prev(i));
 			i--;
@@ -135,16 +139,16 @@ void t4_sort(list<Data *> &l) {
 	}
 }
 
+//counting sort for numbers of limited range
+//-1000< num < 1000
 void t3_sort(list<Data *> &l){
-	int s = l.size();
+
 	int *c = new int[1000000];
-	list<Data *> sorted;
-	Data *p[1020000];
 	for(list<Data *>::iterator i = l.begin(); i != l.end(); i++){
-		int tmp = (int) 1000*(stof((*i)->data));// indexes must be integers
+		int tmp = (int) 1000*(stof((*i)->data));
 		p [(int) tmp ]= *i;
-		c[tmp]++;// keeps track of duplicates
-	}	// multiply 1000 makes all the numbers integers
+		c[tmp]++;
+	}
 
 
 	for (int j = 0;j <999999; j++){
@@ -154,7 +158,7 @@ void t3_sort(list<Data *> &l){
 	}
 	l = sorted;
 }
-
+//comparison function 
 bool compare( Data *d1, Data *d2){
 
 	int i1 = 20;
@@ -163,36 +167,43 @@ bool compare( Data *d1, Data *d2){
 	while ((d2->data)[i2] != '.'){i2--;}
 		
 	if(i1==i2)
-		return ((d1->data).compare((d2->data)) < 0); // true if 
+		return ((d1->data).compare((d2->data)) < 0);  
 	else
-		return (i1 < i2); // true if the first is smaller than the second
+		return (i1 < i2); 
 }
 
-list<Data *> count_a[100000];
-void t1_t2_sort(list<Data *> &l){
-	list<Data *> sorted;
-	int bucket;
+//bucket sort optimized with 2 versions, versions differ by # of buckets
+//sort for t2 (1,000,000 random numbers) has more buckets
+//than t1 (100,000 random numbers)
+void t1_t2_sort(list<Data *> &l, int n){
 	for (list<Data *>::iterator itr = l.begin(); itr != l.end(); itr++){
 		int i1= 20;
 		while ((*itr)-> data[i1] != '.'){ i1--;}  
 		i1 = 20 - i1; 
-				 	
-		if (i1 < 5 ){ 	
-			bucket = atoi( ((*itr)->data).substr(0,(5-i1)).c_str());
+		 	
+		if (i1 < (6+n) ){ 	
+			bucket = atoi( ((*itr)->data).substr(0,((6+n)-i1)).c_str());
 			count_a[bucket].push_back(*itr);
 		}
 		else {
 			count_a[0].push_back(*itr);
 		}
 	}
-		
-	for (int i= 0; i < 100000; i++){
-		if(count_a[i].empty())
-			continue;
-		t4_sort(count_a[i]);
-		sorted.splice(sorted.end(), count_a[i]);
+	if (n == 0){	
+		for (int i= 0; i < 1000000; i++){
+			if(count_a[i].empty())
+				continue;
+			t4_sort(count_a[i]);
+			sorted.splice(sorted.end(), count_a[i]);
+		}
+	}
+	else {
+		for (int i = 0; i< 10000000; i++){
+			if(count_a[i].empty())
+				continue;
+			t4_sort(count_a[i]);
+			sorted.splice(sorted.end(), count_a[i]);
+		}
 	}
 	l = sorted;
 }
-		 	 	
-	
